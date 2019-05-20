@@ -301,7 +301,9 @@ module.exports = function (webpackEnv) {
 
                 // First, run the linter.
                 // It's important to do this before Babel processes the JS.
-                {
+
+                /*禁用eslint*/
+                /*{
                     test: /\.(js|mjs|jsx|ts|tsx)$/,
                     enforce: 'pre',
                     use: [
@@ -315,7 +317,7 @@ module.exports = function (webpackEnv) {
                         },
                     ],
                     include: paths.appSrc,
-                },
+                },*/
                 {
                     // "oneOf" will traverse all following loaders until one will
                     // match the requirements. When no loader matches it will fall
