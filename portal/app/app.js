@@ -13,99 +13,103 @@ class Dep {
     }
 
     notify() {
-        this.deps.forEach((dep) => {
-            dep()
-        })
+        this.deps.forEach((dep) => dep())
     }
 }
 
-Dep.target = null
+function defineReactive(data, key, val, fn) {
+    const dep = new Dep()
+    Object.defineProperty(data, key, {
+        configurable: true,
+        enumerable: true,
+        get: function () {
+            dep.depend()
+            return val
+        },
+        set: function (newVal) {
+            if (newVal === val) return
+            fn && fn(newVal)
+            val = newVal
+            dep.notify()
+        },
+    })
+}
 
-class Observable {
-    constructor(obj) {
-        return this.walk(obj)
-    }
+function initReactive(data) {
+    Object.keys(data).forEach(key => defineReactive(data, key, data[key]))
+}
 
-    walk(obj) {
-        const keys = Object.keys(obj)
-        keys.forEach((key) => {
-            this.defineReactive(obj, key, obj[key])
-        })
-        return obj
-    }
+function computed(data, computed) {
+    let keys = Object.keys(computed)
 
-    defineReactive(obj, key, val) {
-        const dep = new Dep()
-        Object.defineProperty(obj, key, {
-            get() {
-                dep.depend()
+    keys.reduce((ret, key) => {
+        let val;
+        let isFirst = true
+        Object.defineProperty(data, key, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                if (isFirst) {
+                    Dep.target = () => val = computed[key].call()
+                    Dep.target()
+                    Dep.target = null
+                    isFirst = false
+                }
                 return val
             },
-            set(newVal) {
-                val = newVal
-                dep.notify()
-            }
-        })
-    }
-}
-
-class Compute {
-
-    /**
-     * @author  韦胜健
-     * @date    2019/5/20 20:35
-     * @param   obj                 计算属性所属的对象
-     * @param   key                 计算属性名称
-     * @param   exec                  计算属性计算逻辑
-     * @param   onChange            计算计算属性变化触发的函数
-     */
-    constructor(obj, key, exec, onChange) {
-        this.obj = obj
-        this.key = key
-        this.exec = exec
-        this.onChange = onChange
-        return this.defineComputed()
-    }
-
-    defineComputed() {
-        const self = this
-        const onDepUpdated = () => {
-            const val = self.exec()
-            this.onChange(val)
-        }
-
-        Object.defineProperty(self.obj, self.key, {
-            get() {
-                Dep.target = onDepUpdated
-                const val = self.exec()
-                Dep.target = null
-                return val
+            set: function () {
             },
-            set() {
-                console.error('计算属性无法被赋值！')
-            }
         })
-    }
+        return ret
+
+    }, {})
 }
 
-const hero = new Observable({
-    health: 3000,
-    IQ: 150
+const hero = {
+    a: 111,
+    b: 222,
+    c: 333,
+    d: 444,
+}
+
+initReactive(hero)
+
+computed(hero, {
+    ab() {
+        console.log('----------------reset ab-----------------')
+        return hero.a + '' + hero.b
+    },
+    cd() {
+        console.log('----------------reset cd-----------------')
+        return hero.c + '' + hero.d
+    },
+    abab() {
+        console.log('----------------reset abab-----------------')
+        return hero.ab + '-->>' + hero.ab
+    },
 })
 
-new Compute(hero,
-    'type',
-    () => {
-        console.log('get type')
-        return hero.health > 4000 ? '坦克' : '脆皮'
-    },
-    (val) => {
-        console.log(`我的类型是：${val}`)
-    })
+console.log('ab-->>', hero.ab)
+console.log('ab-->>', hero.ab)
+console.log('ab-->>', hero.ab)
+console.log('abab-->>', hero.abab)
 
-console.log(`英雄初始类型：${hero.type}`)
-console.log(`英雄初始类型：${hero.type}`)
-hero.health = 5000
+console.log('set a=aaa')
+hero.a = 'aaa'
+console.log('ab-->>', hero.ab)
+
+console.log('set b=bbb')
+hero.b = 'bbb'
+console.log('ab-->>', hero.ab)
+console.log('abab-->>', hero.abab)
+
+console.log('set a=111,b=222')
+hero.a = '111'
+hero.b = '222'
+console.log('ab-->>', hero.ab)
+console.log('ab-->>', hero.ab)
+console.log('ab-->>', hero.ab)
+console.log('abab-->>', hero.abab)
 
 
 export default class App extends React.Component {
@@ -131,7 +135,7 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.state.data)
+        // console.log(this.state.data)
     }
 
     render() {
