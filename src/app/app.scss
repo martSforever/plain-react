@@ -1,0 +1,39 @@
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  .app-header {
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .app-body {
+    flex: 1;
+    display: flex;
+    //align-items: stretch;
+
+    .app-left {
+      width: 200px;
+    }
+
+    .app-right {
+      flex: 1;
+    }
+  }
+
+  .app-menu {
+    width: 250px;
+  }
+
+}
