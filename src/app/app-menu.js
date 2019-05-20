@@ -116,18 +116,18 @@ export default class AppMenu extends React.Component {
 
     render() {
         return (
-            <div class="app-menu">
+            <div className="app-menu">
                 <div className="app-menu-content">
-                    {this.state.menuGroups.map(group => {
+                    {this.state.menuGroups.map((group, groupIndex) => {
                         return (
-                            <div className="app-menu-group">
+                            <div className="app-menu-group" key={groupIndex}>
                                 <div className="app-menu-group-title">
                                     {group.title}
                                 </div>
                                 <div className="app-menu-item-wrapper">
-                                    {group.menus.map(menu => {
+                                    {group.menus.map((menu, menuIndex) => {
                                         return (
-                                            <div className="app-menu-item">
+                                            <div className="app-menu-item" key={menuIndex}>
                                                 <div>
                                                     <span>{menu.title}</span>
                                                 </div>
