@@ -10,6 +10,7 @@
       padding: 0 16px;
       display: flex;
       align-items: center;
+      border-bottom: solid 1px plVar(colorBorder);
     }
 
     .app-body {
@@ -28,16 +29,47 @@
 
     .app-menu {
       width: 250px;
+      height: 100%;
+      position: relative;
+
+      &:before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: 3px;
+        content: '';
+        box-shadow: 0 0 12px #ddd;
+      }
 
       .app-menu-content {
+        height: 100%;
+        padding: 16px;
+        box-sizing: border-box;
+        position: relative;
+        z-index: 1;
+        background-color: white;
+
         .app-menu-group {
           .app-menu-group-title {
             color: plVar(colorPrimary);
+            font-size: 12px;
+            font-weight: bold;
+            box-sizing: border-box;
+            padding: 6px 0;
           }
 
           .app-menu-item-wrapper {
             .app-menu-item {
+              font-size: 12px;
+              box-sizing: border-box;
+              padding: 6px 13px;
+              cursor: pointer;
+              border-radius: plVar(borderFillet);
 
+              &:hover {
+                background-color: plVar(colorPrimaryLighter);
+              }
             }
           }
         }
