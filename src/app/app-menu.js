@@ -22,7 +22,7 @@ export default class AppMenu extends React.Component {
                         {title: 'BaseTable基础表格列测试', icon: 'pl-table-solid', page: '/table/demo-base-table-column', complete: false},
                     ],
                 },
-                {
+                /*{
                     title: '测试',
                     menus: [
                         {title: 'Test测试', icon: 'pl-tools', page: '/normal/demo-test', complete: true},
@@ -109,7 +109,7 @@ export default class AppMenu extends React.Component {
                 {
                     title: '指令',
                     menus: [],
-                },
+                },*/
             ],
         }
     }
