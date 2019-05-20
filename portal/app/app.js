@@ -1,5 +1,4 @@
 import React from 'react';
-import './app.scss'
 import AppMenu from './app-menu'
 
 export default class App extends React.Component {
