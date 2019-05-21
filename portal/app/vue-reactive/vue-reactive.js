@@ -19,16 +19,10 @@ function defineReactive(data, key, val, fn) {
     })
 }
 
-function initData(data) {
-    Object.keys(data).forEach(key => defineReactive(data, key, data[key]))
-}
-
 function computed(data, computed) {
     let keys = Object.keys(computed)
     keys.reduce((ret, key) => {
-
-        const watcher = new Watcher(key, computed[key])
-
+        const watcher = new Watcher(data, key, computed[key])
         Object.defineProperty(data, key, {
             configurable: true,
             enumerable: true,
@@ -47,6 +41,17 @@ function computed(data, computed) {
         return ret
 
     }, {})
+}
+
+function watch(data, watch) {
+    Object.keys(watch).forEach(key => {
+        const handler = watch[key]
+        const watcher = new Watcher(data, key, key, handler, true)
+    })
+}
+
+function initData(data) {
+    Object.keys(data).forEach(key => defineReactive(data, key, data[key]))
 }
 
 const hero = {
@@ -73,7 +78,26 @@ computed(hero, {
     },
 })
 
-console.log('这里测试读取三次ab以及读取两次abab，结果是第一次读取ab的时候执行了一次ab，第一次读取abab的时候执行了一次abab，符合预期')
+watch(hero, {
+    a(newVal, oldVal) {
+        console.log(`a change from [${oldVal}] to [${newVal}]`)
+    },
+    b(newVal, oldVal) {
+        console.log(`b change from [${oldVal}] to [${newVal}]`)
+    },
+})
+
+export function changeA(val) {
+    console.log('changeA')
+    hero.a = val
+}
+
+export function changeB(val) {
+    console.log('changeB')
+    hero.b = val
+}
+
+/*console.log('这里测试读取三次ab以及读取两次abab，结果是第一次读取ab的时候执行了一次ab，第一次读取abab的时候执行了一次abab，符合预期')
 console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
@@ -116,3 +140,12 @@ console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
 console.log('abab\t\t\t\t', hero.abab)
 console.log('abab\t\t\t\t', hero.abab)
+
+console.log('')
+console.log('||||||||||||||||||||||||||||||||')
+console.log('')*/
+
+console.log(hero.a)
+hero.a = new Date().getTime()
+console.log(hero.a)
+
