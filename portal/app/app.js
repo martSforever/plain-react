@@ -1,21 +1,60 @@
 import React from 'react';
 import AppMenu from './app-menu'
 
+
 class Dep {
     constructor() {
-        this.deps = []
+        this.watchers = []
     }
 
     depend() {
-        if (Dep.target && this.deps.indexOf(Dep.target) === -1) {
-            this.deps.push(Dep.target)
+        if (Dep.watcher && this.watchers.indexOf(Dep.watcher) === -1) {
+            this.watchers.push(Dep.watcher)
         }
     }
 
     notify() {
-        this.deps.forEach((dep) => dep())
+        this.watchers.forEach((watcher) => watcher.evaluate())
+    }
+
+    dirty() {
+        this.watchers.forEach((watcher) => watcher.dirty = true)
     }
 }
+
+class Watcher {
+    value;
+    get;
+    dirty;
+    dep;
+
+    constructor(get) {
+        Object.assign(this, {
+            value: null,
+            get,
+
+            dirty: true,
+            dep: new Dep()
+        })
+    }
+
+    evaluate() {
+        if (this.dirty) return
+        Dep.watcher = this
+        !!this.get && (this.value = this.get.call())
+        this.dep.dirty()
+        Dep.watcher = null
+    }
+
+    depend() {
+        this.dep.depend()
+    }
+
+    notify() {
+        this.dep.notify()
+    }
+}
+
 
 function defineReactive(data, key, val, fn) {
     const dep = new Dep()
@@ -35,27 +74,25 @@ function defineReactive(data, key, val, fn) {
     })
 }
 
-function initReactive(data) {
+function initData(data) {
     Object.keys(data).forEach(key => defineReactive(data, key, data[key]))
 }
 
 function computed(data, computed) {
     let keys = Object.keys(computed)
-
     keys.reduce((ret, key) => {
-        let val;
-        let isFirst = true
+        const watcher = new Watcher(computed[key])
+
         Object.defineProperty(data, key, {
             configurable: true,
             enumerable: true,
             get: function () {
-                if (isFirst) {
-                    Dep.target = () => val = computed[key].call()
-                    Dep.target()
-                    Dep.target = null
-                    isFirst = false
+                watcher.depend()
+                if (watcher.dirty) {
+                    watcher.dirty = false
+                    watcher.evaluate()
                 }
-                return val
+                return watcher.value
             },
             set: function () {
             },
@@ -72,7 +109,7 @@ const hero = {
     d: 444,
 }
 
-initReactive(hero)
+initData(hero)
 
 computed(hero, {
     ab() {
@@ -93,15 +130,28 @@ console.log('ab-->>', hero.ab)
 console.log('ab-->>', hero.ab)
 console.log('ab-->>', hero.ab)
 console.log('abab-->>', hero.abab)
+console.log('abab-->>', hero.abab)
+
+console.log('')
+console.log('||||||||||||||||||||||||||||||||')
+console.log('')
 
 console.log('set a=aaa')
 hero.a = 'aaa'
 console.log('ab-->>', hero.ab)
 
+console.log('')
+console.log('||||||||||||||||||||||||||||||||')
+console.log('')
+
 console.log('set b=bbb')
 hero.b = 'bbb'
 console.log('ab-->>', hero.ab)
 console.log('abab-->>', hero.abab)
+
+console.log('')
+console.log('||||||||||||||||||||||||||||||||')
+console.log('')
 
 console.log('set a=111,b=222')
 hero.a = '111'
@@ -109,6 +159,7 @@ hero.b = '222'
 console.log('ab-->>', hero.ab)
 console.log('ab-->>', hero.ab)
 console.log('ab-->>', hero.ab)
+console.log('abab-->>', hero.abab)
 console.log('abab-->>', hero.abab)
 
 
