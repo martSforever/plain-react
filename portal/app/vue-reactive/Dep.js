@@ -1,13 +1,13 @@
-let uid = 0
+let depId = 0
 
 export class Dep {
-    static target;
+    static target;                                              //全局变量
     id;
     subs;
 
     constructor() {
         this.subs = []
-        this.id = ++uid
+        this.id = ++depId
         Dep.target = null
     }
 

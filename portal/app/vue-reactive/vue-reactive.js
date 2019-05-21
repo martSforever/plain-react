@@ -46,7 +46,7 @@ function computed(data, computed) {
 function watch(data, watch) {
     Object.keys(watch).forEach(key => {
         const handler = watch[key]
-        const watcher = new Watcher(data, key, key, handler, true)
+        new Watcher(data, key, key, handler, true)
     })
 }
 
@@ -87,6 +87,12 @@ watch(hero, {
     },
 })
 
+let count = 0
+
+export function getCount() {
+    return ++count
+}
+
 export function changeA(val) {
     console.log('changeA')
     hero.a = val
@@ -97,7 +103,7 @@ export function changeB(val) {
     hero.b = val
 }
 
-/*console.log('这里测试读取三次ab以及读取两次abab，结果是第一次读取ab的时候执行了一次ab，第一次读取abab的时候执行了一次abab，符合预期')
+console.warn('这里测试读取三次ab以及读取两次abab，结果是第一次读取ab的时候执行了一次ab，第一次读取abab的时候执行了一次abab，符合预期')
 console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
@@ -108,7 +114,7 @@ console.log('')
 console.log('||||||||||||||||||||||||||||||||')
 console.log('')
 
-console.log('这里测试重置a的值，然后读取两次ab，不读取abab，结果是第一次读取ab的时候执行了一次ab，没有执行abab，符合预期，因为此时没有使用abab，所以不需要重新计算abab')
+console.warn('这里测试重置a的值，然后读取两次ab，不读取abab，结果是第一次读取ab的时候执行了一次ab，没有执行abab，符合预期，因为此时没有使用abab，所以不需要重新计算abab')
 console.log('set a=aaa')
 hero.a = 'aaa'
 console.log('ab\t\t\t\t', hero.ab)
@@ -118,7 +124,7 @@ console.log('')
 console.log('||||||||||||||||||||||||||||||||')
 console.log('')
 
-console.log('这里测试重置b的值，然后重新读取ab以及abab各两次，结果都是第一次读取的时候执行了一次，符合预期')
+console.warn('这里测试重置b的值，然后重新读取ab以及abab各两次，结果都是第一次读取的时候执行了一次，符合预期')
 console.log('set b=bbb')
 hero.b = 'bbb'
 console.log('ab\t\t\t\t', hero.ab)
@@ -131,10 +137,10 @@ console.log('')
 console.log('||||||||||||||||||||||||||||||||')
 console.log('')
 
-console.log('这里测试同时重置a，b的值，然后读取三次ab，读取两次abab，结果是ab以及abab在第一次读取的时候执行了一次，符合预期')
+console.warn('这里测试同时重置a，b的值，然后读取三次ab，读取两次abab，结果是ab以及abab在第一次读取的时候执行了一次，符合预期')
 console.log('set a=111,b=222')
-hero.a = '111'
-hero.b = '222'
+hero.a = 'mmm'
+hero.b = 'nnn'
 console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
 console.log('ab\t\t\t\t', hero.ab)
@@ -143,9 +149,14 @@ console.log('abab\t\t\t\t', hero.abab)
 
 console.log('')
 console.log('||||||||||||||||||||||||||||||||')
-console.log('')*/
+console.log('')
 
+
+console.warn('这里测试在一次执行过程中，多次修改同一个值，是否会导致watch中的handle函数触发多次，结果是只触发了一次，符合预期')
+console.warn('整个过程执行完，a一共变化了5次，a=aaa,a=mmm,以及三次a=getCount()，但是这个在a频繁变化的过程中，最后只触发a的watch handler一次，而且是在所有动作执行完毕才触发的，同理b也是，一共改变了2次，符合预期')
 console.log(hero.a)
-hero.a = new Date().getTime()
+hero.a = getCount()
+hero.a = getCount()
+hero.a = getCount()
 console.log(hero.a)
 

@@ -1,8 +1,23 @@
-import PlainUtils from 'plain-utils'
 import {popTarget, pushTarget} from "./Dep";
 
-const $utils = PlainUtils.$utils
-let uid = 0
+function typeOf(obj) {
+    const toString = Object.prototype.toString;
+    const map = {
+        '[object Boolean]': 'boolean',
+        '[object Number]': 'number',
+        '[object String]': 'string',
+        '[object Function]': 'function',
+        '[object Array]': 'array',
+        '[object Date]': 'date',
+        '[object RegExp]': 'regExp',
+        '[object Undefined]': 'undefined',
+        '[object Null]': 'null',
+        '[object Object]': 'object'
+    };
+    return map[toString.call(obj)];
+}
+
+let watchId = 0
 
 export const unicodeRegExp = /a-zA-Z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F-\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD/
 const bailRE = new RegExp(`[^${unicodeRegExp.source}.$_\\d]`)
@@ -40,14 +55,14 @@ export class Watcher {
     constructor(data, key, expressOrFunction, callback, user) {
         this.data = data
         this.key = key
-        this.id = ++uid
+        this.id = ++watchId
         this.dirty = true
         this.value = undefined
         this.callback = callback
         this.active = true
         this.user = user
 
-        switch ($utils.typeOf(expressOrFunction)) {
+        switch (typeOf(expressOrFunction)) {
             case 'function':
                 this.getter = expressOrFunction
                 break;
@@ -57,7 +72,6 @@ export class Watcher {
         }
         if (!!this.user) {
             this.value = this.get()
-            console.log('init touch:' + this.value)
         }
     }
 
@@ -121,18 +135,24 @@ export class Watcher {
         this.dirty = false
     }
 
-    /**
-     * Scheduler job interface.
-     * Will be called by the scheduler.
-     */
     run() {
-        if (this.active) {
-            const value = this.get()
-            if (value !== this.value || $utils.typeOf(value) === 'object' || this.deep) {
-                const oldValue = this.value
-                this.value = value
-                !!this.callback && this.callback(value, oldValue)
-            }
+        if (!!this.timer) {
+            clearTimeout(this.timer)
         }
+        this.timer = setTimeout(() => {
+            if (this.active) {
+                const value = this.get()
+                if (value !== this.value || typeOf(value) === 'object' || this.deep) {
+                    const oldValue = this.value
+                    this.value = value
+                    if (!!this.callback) {
+                        this.callback(value, oldValue)
+                    }
+                }
+            }
+            this.timer = null
+        }, 0)
+
+
     }
 }

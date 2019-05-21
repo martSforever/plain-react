@@ -1,7 +1,7 @@
 import React from 'react';
 import AppMenu from './app-menu'
 
-import {changeA, changeB} from "./vue-reactive/vue-reactive";
+import {changeA, changeB, getCount} from "./vue-reactive/vue-reactive";
 
 export default class App extends React.Component {
 
@@ -39,8 +39,8 @@ export default class App extends React.Component {
                         {/*<input type="text" value={this.state.a} onChange={e => this.pl_change(e, 'a')}/>*/}
                         {/*<input type="text" value={this.state.b} onChange={e => this.pl_change(e, 'b')}/>*/}
 
-                        <button onClick={() => changeA(new Date().getTime())}>change A</button>
-                        <button onClick={() => changeB(new Date().getTime())}>change B</button>
+                        <button onClick={() => changeA(getCount())}>change A</button>
+                        <button onClick={() => changeB(getCount())}>change B</button>
                     </div>
                 </div>
             </div>
