@@ -64,9 +64,8 @@ export class Watcher {
     get() {
         pushTarget(this)
         let value
-        const vm = this.vm
         try {
-            value = this.getter.call(vm, vm)
+            value = this.getter.call()
         } catch (e) {
             console.error(e)
         } finally {

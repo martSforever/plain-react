@@ -69,42 +69,50 @@ computed(hero, {
     },
     abab() {
         console.log('----------------reset abab-----------------')
-        return hero.ab + '-->>' + hero.ab
+        return hero.ab + '+++' + hero.ab
     },
 })
 
-console.log('ab-->>', hero.ab)
-console.log('ab-->>', hero.ab)
-console.log('ab-->>', hero.ab)
-console.log('abab-->>', hero.abab)
-console.log('abab-->>', hero.abab)
+console.log('这里测试读取三次ab以及读取两次abab，结果是第一次读取ab的时候执行了一次ab，第一次读取abab的时候执行了一次abab，符合预期')
+console.log('ab\t\t\t\t', hero.ab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('abab\t\t\t\t', hero.abab)
+console.log('abab\t\t\t\t', hero.abab)
 
 console.log('')
 console.log('||||||||||||||||||||||||||||||||')
 console.log('')
 
+console.log('这里测试重置a的值，然后读取两次ab，不读取abab，结果是第一次读取ab的时候执行了一次ab，没有执行abab，符合预期，因为此时没有使用abab，所以不需要重新计算abab')
 console.log('set a=aaa')
 hero.a = 'aaa'
-console.log('ab-->>', hero.ab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('ab\t\t\t\t', hero.ab)
 
 console.log('')
 console.log('||||||||||||||||||||||||||||||||')
 console.log('')
 
+console.log('这里测试重置b的值，然后重新读取ab以及abab各两次，结果都是第一次读取的时候执行了一次，符合预期')
 console.log('set b=bbb')
 hero.b = 'bbb'
-console.log('ab-->>', hero.ab)
-console.log('abab-->>', hero.abab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('abab\t\t\t\t', hero.abab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('abab\t\t\t\t', hero.abab)
+
 
 console.log('')
 console.log('||||||||||||||||||||||||||||||||')
 console.log('')
 
+console.log('这里测试同时重置a，b的值，然后读取三次ab，读取两次abab，结果是ab以及abab在第一次读取的时候执行了一次，符合预期')
 console.log('set a=111,b=222')
 hero.a = '111'
 hero.b = '222'
-console.log('ab-->>', hero.ab)
-console.log('ab-->>', hero.ab)
-console.log('ab-->>', hero.ab)
-console.log('abab-->>', hero.abab)
-console.log('abab-->>', hero.abab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('ab\t\t\t\t', hero.ab)
+console.log('abab\t\t\t\t', hero.abab)
+console.log('abab\t\t\t\t', hero.abab)
