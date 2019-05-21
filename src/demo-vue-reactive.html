@@ -17,14 +17,393 @@
         #app {
             display: flex;
             align-items: center;
-            justify-content: center;
+            padding: 0 100px;
+        }
+
+        .btn-success{
+            margin-left: 20px;
         }
     </style>
 </head>
 <body id="app">
-<button type="button" class="btn btn-primary">（首选项）Primary</button>
+<button type="button" class="btn btn-primary" onclick="changeA(getCount())">change a</button>
+<button type="button" class="btn btn-success" onclick="changeB(getCount())">change b</button>
 
 <script type="text/javascript">
+
+    console.log('--->>>start')
+
+    /*---------------------------------------Dep-------------------------------------------*/
+    let depId = 0
+
+    class Dep {
+        static target
+        id
+        subs
+
+        constructor() {
+            this.subs = []
+            this.id = ++depId
+            Dep.target = null
+        }
+
+        addSub(sub) {
+            this.subs.push(sub)
+        }
+
+        removeSub(sub) {
+            const index = this.subs.indexOf(sub)
+            if (index > -1) this.subs.splice(index, 1)
+        }
+
+        depend() {
+            if (Dep.target) {
+                Dep.target.addDep(this)
+            }
+        }
+
+        notify() {
+            const subs = this.subs.slice()
+            subs.sort((a, b) => a.id - b.id)
+            for (let i = 0, l = subs.length; i < l; i++) {
+                subs[i].update()
+            }
+        }
+    }
+
+    const targetStack = []
+    Dep.target = undefined
+
+    function pushTarget(target) {
+        targetStack.push(target)
+        Dep.target = target
+    }
+
+    function popTarget() {
+        targetStack.pop()
+        Dep.target = targetStack[targetStack.length - 1]
+    }
+
+    /*---------------------------------------Watcher-------------------------------------------*/
+    function typeOf(obj) {
+        const toString = Object.prototype.toString;
+        const map = {
+            '[object Boolean]': 'boolean',
+            '[object Number]': 'number',
+            '[object String]': 'string',
+            '[object Function]': 'function',
+            '[object Array]': 'array',
+            '[object Date]': 'date',
+            '[object RegExp]': 'regExp',
+            '[object Undefined]': 'undefined',
+            '[object Null]': 'null',
+            '[object Object]': 'object'
+        };
+        return map[toString.call(obj)];
+    }
+
+    let watchId = 0
+    const unicodeRegExp = /a-zA-Z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F-\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD/
+    const bailRE = new RegExp(`[^${unicodeRegExp.source}.$_\\d]`)
+
+    function parsePath(path) {
+        if (bailRE.test(path)) {
+            return
+        }
+        const segments = path.split('.')
+        return function (obj) {
+            for (let i = 0; i < segments.length; i++) {
+                if (!obj) return
+                obj = obj[segments[i]]
+            }
+            return obj
+        }
+    }
+
+    class Watcher {
+        getter
+        key
+        callback
+        user
+        data
+
+        id
+        dirty
+        value
+        deps = []
+        newDeps = []
+        depIds = new Set()
+        newDepIds = new Set()
+        active
+
+        constructor(data, key, expressOrFunction, callback, user) {
+            this.data = data
+            this.key = key
+            this.id = ++watchId
+            this.dirty = true
+            this.value = undefined
+            this.callback = callback
+            this.active = true
+            this.user = user
+
+            switch (typeOf(expressOrFunction)) {
+                case 'function':
+                    this.getter = expressOrFunction
+                    break;
+                case 'string':
+                    this.getter = parsePath(expressOrFunction)
+                    break
+            }
+            if (!!this.user) {
+                this.value = this.get()
+            }
+        }
+
+        addDep(dep) {
+            const id = dep.id
+            if (!this.newDepIds.has(id)) {
+                this.newDepIds.add(id)
+                this.newDeps.push(dep)
+                if (!this.depIds.has(id)) {
+                    dep.addSub(this)
+                }
+            }
+        }
+
+        depend() {
+            this.deps.forEach(dep => dep.depend())
+        }
+
+        cleanupDeps() {
+            let i = this.deps.length
+            while (i--) {
+                const dep = this.deps[i]
+                if (!this.newDepIds.has(dep.id)) {
+                    dep.removeSub(this)
+                }
+            }
+            let tmp = this.depIds
+            this.depIds = this.newDepIds
+            this.newDepIds = tmp
+            this.newDepIds.clear()
+            tmp = this.deps
+            this.deps = this.newDeps
+            this.newDeps = tmp
+            this.newDeps.length = 0
+        }
+
+        /**
+         * Evaluate the getter, and re-collect dependencies.
+         */
+        get() {
+            pushTarget(this)
+            let value
+            try {
+                value = this.getter.call(this.data, this.data)
+            } catch (e) {
+                console.error(e)
+            } finally {
+                popTarget()
+                this.cleanupDeps()
+            }
+            return value
+        }
+
+        update() {
+            this.dirty = true
+            !!this.user && this.run()
+        }
+
+        evaluate() {
+            this.value = this.get()
+            this.dirty = false
+        }
+
+        run() {
+            if (!!this.timer) {
+                clearTimeout(this.timer)
+            }
+            this.timer = setTimeout(() => {
+                if (this.active) {
+                    const value = this.get()
+                    if (value !== this.value || typeOf(value) === 'object' || this.deep) {
+                        const oldValue = this.value
+                        this.value = value
+                        if (!!this.callback) {
+                            this.callback(value, oldValue)
+                        }
+                    }
+                }
+                this.timer = null
+            }, 0)
+
+
+        }
+    }
+
+    function defineReactive(data, key, val, fn) {
+        const dep = new Dep()
+        Object.defineProperty(data, key, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                dep.depend()
+                return val
+            },
+            set: function (newVal) {
+                if (newVal === val) return
+                fn && fn(newVal)
+                val = newVal
+                dep.notify()
+            },
+        })
+    }
+
+    function computed(data, computed) {
+        let keys = Object.keys(computed)
+        keys.reduce((ret, key) => {
+            const watcher = new Watcher(data, key, computed[key])
+            Object.defineProperty(data, key, {
+                configurable: true,
+                enumerable: true,
+                get: function () {
+                    if (watcher.dirty) {
+                        watcher.evaluate()
+                    }
+                    if (Dep.target) {
+                        watcher.depend()
+                    }
+                    return watcher.value
+                },
+                set: function () {
+                },
+            })
+            return ret
+
+        }, {})
+    }
+
+    function watch(data, watch) {
+        Object.keys(watch).forEach(key => {
+            const handler = watch[key]
+            new Watcher(data, key, key, handler, true)
+        })
+    }
+
+    function initData(data) {
+        Object.keys(data).forEach(key => defineReactive(data, key, data[key]))
+    }
+
+    const hero = {
+        a: 111,
+        b: 222,
+        c: 333,
+        d: 444,
+    }
+
+    initData(hero)
+
+    computed(hero, {
+        ab() {
+            console.log('----------------reset ab-----------------')
+            return hero.a + '' + hero.b
+        },
+        cd() {
+            console.log('----------------reset cd-----------------')
+            return hero.c + '' + hero.d
+        },
+        abab() {
+            console.log('----------------reset abab-----------------')
+            return hero.ab + '+++' + hero.ab
+        },
+    })
+
+    watch(hero, {
+        a(newVal, oldVal) {
+            console.log(`a change from [${oldVal}] to [${newVal}]`)
+        },
+        b(newVal, oldVal) {
+            console.log(`b change from [${oldVal}] to [${newVal}]`)
+        },
+    })
+
+    let count = 0
+
+    function getCount() {
+        return ++count
+    }
+
+    function changeA(val) {
+        hero.a = val
+        console.log(hero.a)
+        console.log(hero.a)
+        console.log(hero.a)
+    }
+
+    function changeB(val) {
+        hero.b = val
+        console.log(hero.b)
+        console.log(hero.b)
+        console.log(hero.b)
+    }
+
+    console.warn('这里测试读取三次ab以及读取两次abab，结果是第一次读取ab的时候执行了一次ab，第一次读取abab的时候执行了一次abab，符合预期')
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('abab\t\t\t\t', hero.abab)
+    console.log('abab\t\t\t\t', hero.abab)
+
+    console.log('')
+    console.log('||||||||||||||||||||||||||||||||')
+    console.log('')
+
+    console.warn('这里测试重置a的值，然后读取两次ab，不读取abab，结果是第一次读取ab的时候执行了一次ab，没有执行abab，符合预期，因为此时没有使用abab，所以不需要重新计算abab')
+    console.log('set a=aaa')
+    hero.a = 'aaa'
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('ab\t\t\t\t', hero.ab)
+
+    console.log('')
+    console.log('||||||||||||||||||||||||||||||||')
+    console.log('')
+
+    console.warn('这里测试重置b的值，然后重新读取ab以及abab各两次，结果都是第一次读取的时候执行了一次，符合预期')
+    console.log('set b=bbb')
+    hero.b = 'bbb'
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('abab\t\t\t\t', hero.abab)
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('abab\t\t\t\t', hero.abab)
+
+
+    console.log('')
+    console.log('||||||||||||||||||||||||||||||||')
+    console.log('')
+
+    console.warn('这里测试同时重置a，b的值，然后读取三次ab，读取两次abab，结果是ab以及abab在第一次读取的时候执行了一次，符合预期')
+    console.log('set a=111,b=222')
+    hero.a = 'mmm'
+    hero.b = 'nnn'
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('ab\t\t\t\t', hero.ab)
+    console.log('abab\t\t\t\t', hero.abab)
+    console.log('abab\t\t\t\t', hero.abab)
+
+    console.log('')
+    console.log('||||||||||||||||||||||||||||||||')
+    console.log('')
+
+
+    console.warn('这里测试在一次执行过程中，多次修改同一个值，是否会导致watch中的handle函数触发多次，结果是只触发了一次，符合预期')
+    console.warn('整个过程执行完，a一共变化了5次，a=aaa,a=mmm,以及三次a=getCount()，但是这个在a频繁变化的过程中，最后只触发a的watch handler一次，而且是在所有动作执行完毕才触发的，同理b也是，一共改变了2次，符合预期')
+    console.log(hero.a)
+    hero.a = getCount()
+    hero.a = getCount()
+    hero.a = getCount()
+    console.log(hero.a)
+
 
 </script>
 

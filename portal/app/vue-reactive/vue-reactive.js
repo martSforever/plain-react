@@ -94,12 +94,10 @@ export function getCount() {
 }
 
 export function changeA(val) {
-    console.log('changeA')
     hero.a = val
 }
 
 export function changeB(val) {
-    console.log('changeB')
     hero.b = val
 }
 
