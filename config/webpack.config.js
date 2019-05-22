@@ -479,6 +479,10 @@ module.exports = function (webpackEnv) {
         },
         plugins: [
             // Generates an `index.html` file with the <script> injected.
+            //自动加载模块，而不必到处 import 或 require 。
+            new webpack.ProvidePlugin({
+                React: "React"
+            }),
             new HtmlWebpackPlugin(
                 Object.assign(
                     {},
