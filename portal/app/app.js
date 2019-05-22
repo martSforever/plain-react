@@ -4,13 +4,30 @@ import {PlainComponent} from "../../src/PlainComponent/PlainComponent";
 
 export default class App extends PlainComponent {
 
+    static defaultProps = {
+        name: '111',
+        age: 20,
+    }
+
+    data() {
+        return {
+            aaa: 111,
+            bbb: 222,
+        }
+    }
+
+    watch = {}
+
+    computed = {}
+
+    methods = {}
+
 
     constructor(props) {
         super(props)
+        console.log('app', this.props)
     }
 
-    componentDidMount() {
-    }
 
     render() {
         return (
