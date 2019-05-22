@@ -1,7 +1,16 @@
 import {Dep} from "./Dep";
 import {Watcher} from "./Watcher";
 
-function defineReactive(data, key, val, fn) {
+/**
+ * 初始化响应式属性
+ * @author  韦胜健
+ * @date    2019/5/22 09:51
+ * @param   data    响应式属性所属对象
+ * @param   key     响应式属性名
+ * @param   val     响应式属性初始值
+ *
+ */
+function defineReactive(data, key, val) {
     const dep = new Dep()
     Object.defineProperty(data, key, {
         configurable: true,
@@ -12,7 +21,6 @@ function defineReactive(data, key, val, fn) {
         },
         set: function (newVal) {
             if (newVal === val) return
-            fn && fn(newVal)
             val = newVal
             dep.notify()
         },

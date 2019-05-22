@@ -241,7 +241,7 @@
         }
     }
 
-    function defineReactive(data, key, val, fn) {
+    function defineReactive(data, key, val) {
         const dep = new Dep()
         Object.defineProperty(data, key, {
             configurable: true,
@@ -252,7 +252,6 @@
             },
             set: function (newVal) {
                 if (newVal === val) return
-                fn && fn(newVal)
                 val = newVal
                 dep.notify()
             },
