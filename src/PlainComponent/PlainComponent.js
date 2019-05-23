@@ -1,12 +1,62 @@
-import {$utils} from "../scripts/utils";
+import {$utils, merge} from "../scripts/utils";
 import {sharedPropertyDefinition, proxy} from "./proxy";
 
 import {Dep} from "../../portal/app/vue-reactive/Dep";
 import {Watcher} from "../../portal/app/vue-reactive/Watcher";
 
+function pl_getFromContext(ctx) {
+    if ($utils.typeOf(ctx) === 'function') ctx = new ctx()
+
+    const props = {...(ctx.props || {})}
+    const state = ctx.state || {}
+    const data = !!ctx.data ? ctx.data() : {}
+    const methods = !!ctx.methods ? ctx.methods() : {}
+    const computed = !!ctx.computed ? ctx.computed() : {}
+    const watch = !!ctx.watch ? ctx.watch() : {}
+
+    const created = ctx.created || $utils.noop
+    const mounted = ctx.mounted || $utils.noop
+    const beforeDestroyed = ctx.beforeDestroyed || $utils.noop
+    const destroyed = ctx.destroyed || $utils.noop
+
+    return {
+        props,
+        state,
+        data,
+        methods,
+        computed,
+        watch,
+
+        created,
+        mounted,
+        beforeDestroyed,
+        destroyed,
+    }
+}
+
+function pl_initContextDatas(ctx) {
+    const mixins = !!ctx.mixins ? ctx.mixins() : []
+    mixins.push(ctx)
+    let hook = {created: null, mounted: null, beforeDestroyed: null, destroyed: null}
+    const datas = mixins.reduce((ret, item) => {
+        const itemData = pl_getFromContext(item);
+        ['created', 'mounted', 'beforeDestroyed', 'destroyed'].forEach((name) => {
+            const hookFunc = hook[name]
+            hook[name] = () => {
+                !!hookFunc && hookFunc.apply(ctx)
+                !!itemData[name] && itemData[name].apply(ctx)
+            }
+        })
+        ret.push(itemData)
+        return ret
+    }, [])
+    ctx.__data__ = merge.all(datas)
+    Object.assign(ctx, hook)
+}
+
 function pl_initProps(ctx) {
-    ctx.state = ctx.state || {}
-    const _props = {...(ctx.props || {})}
+    ctx.state = ctx.__data__.state
+    const _props = {...ctx.__data__.props}
     ctx.state._props = _props
     ctx.state.$props = (props) => Object.assign(_props, props)
     Object.keys(_props).forEach(key => {
@@ -36,7 +86,7 @@ function pl_initProps(ctx) {
 }
 
 function pl_initData(ctx) {
-    ctx.state = Object.assign({}, ctx.state, !!ctx.data ? ctx.data() : {})
+    ctx.state = Object.assign({}, ctx.state, ctx.__data__.data)
     Object.keys(ctx.state).forEach(key => {
         const dep = new Dep()
         let val = ctx.state[key]
@@ -59,7 +109,7 @@ function pl_initData(ctx) {
 }
 
 function pl_initMethods(ctx) {
-    const methods = !!ctx.methods ? ctx.methods() : {}
+    const methods = ctx.__data__.methods
     ctx.$methods = {}
     Object.keys(methods).forEach(key => {
         const func = methods[key]
@@ -71,7 +121,7 @@ function pl_initMethods(ctx) {
 }
 
 function pl_initComputed(ctx) {
-    const computed = !!ctx.computed ? ctx.computed() : {}
+    const computed = ctx.__data__.computed
     Object.keys(computed).forEach(key => {
         const getter = () => {
             if (!computed[key]) return
@@ -96,7 +146,7 @@ function pl_initComputed(ctx) {
 }
 
 function pl_initWatch(ctx) {
-    const watch = !!ctx.watch ? ctx.watch() : {}
+    const watch = ctx.__data__.watch
     Object.keys(watch).forEach(key => new Watcher(ctx, key, key, watch[key], true))
 }
 
@@ -105,6 +155,7 @@ export class PlainComponent extends React.Component {
 
     constructor(props) {
         super(props)
+        pl_initContextDatas(this)
         pl_initProps(this)
         pl_initData(this)
         pl_initMethods(this)

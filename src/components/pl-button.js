@@ -1,6 +1,12 @@
 import {PlainComponent} from "../PlainComponent/PlainComponent";
+import {MountedMixin} from "../mixins/MountedMixin";
+import {ThrottleMixin} from "../mixins/ThrottleMixin";
 
 export class PlButton extends PlainComponent {
+
+    mixins() {
+        return [MountedMixin, ThrottleMixin]
+    }
 
     static defaultProps = {
         type: 'fill',
@@ -20,7 +26,12 @@ export class PlButton extends PlainComponent {
     }
 
     created() {
-        // console.log('button created', this)
+        console.log('created button')
+        console.log('this button', this)
+    }
+
+    mounted() {
+        console.log('mounted button')
     }
 
     watch() {
