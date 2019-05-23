@@ -1,6 +1,4 @@
-import PlainUtils from 'plain-utils'
-
-const {$utils, $dom, StorageService} = PlainUtils
+import {$utils, $dom, StorageService} from "./utils";
 
 export default function Service($plain) {
     const service = {

@@ -1,9 +1,19 @@
+import {$utils} from "../scripts/utils";
+import {proxy} from "./proxy";
+
+const dataKey = 'state'
+
+function pl_initData(dataFunc, ctx) {
+    dataFunc = dataFunc || $utils.noop
+    ctx[dataKey] = dataFunc.apply(ctx) || {}
+    Object.keys(ctx[dataKey]).forEach(key => {
+        proxy(ctx, dataKey, key)
+    })
+}
+
 export class PlainComponent extends React.Component {
     constructor(props) {
         super(props)
-        console.log('component', this.props)
-        if (!!this.data) {
-            console.log('data', this.data())
-        }
+        pl_initData(this.data, this)
     }
 }

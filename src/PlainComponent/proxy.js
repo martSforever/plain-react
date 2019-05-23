@@ -1,8 +1,10 @@
+import {$utils} from "../scripts/utils";
+
 const sharedPropertyDefinition = {
     enumerable: true,
     configurable: true,
-    get: noop,
-    set: noop
+    get: $utils.noop,
+    set: $utils.noop
 }
 
 export function proxy(target, sourceKey, key) {
@@ -10,7 +12,7 @@ export function proxy(target, sourceKey, key) {
         return this[sourceKey][key]
     }
     sharedPropertyDefinition.set = function proxySetter(val) {
-        this[sourceKey][key] = val
+        this.setState({[key]: val})
     }
     Object.defineProperty(target, key, sharedPropertyDefinition)
 }

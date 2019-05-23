@@ -22,13 +22,6 @@ export default class App extends PlainComponent {
 
     methods = {}
 
-
-    constructor(props) {
-        super(props)
-        console.log('app', this.props)
-    }
-
-
     render() {
         return (
             <div className="app">
@@ -41,11 +34,17 @@ export default class App extends PlainComponent {
                         <AppMenu ref="menu"/>
                     </div>
                     <div className="app-right">
-                        content
+                        {this.aaa}-{this.bbb}
+                        <button onClick={val => this.pl_click()}>change a</button>
                     </div>
                 </div>
             </div>
         )
+    }
+
+    pl_click() {
+        this.aaa = '20200202'
+        console.log(this)
     }
 
 
