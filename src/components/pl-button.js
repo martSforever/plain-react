@@ -64,7 +64,12 @@ export class PlButton extends PlainComponent {
 
     render() {
         return (
-            <button onClick={this.pl_click} className={this.classes}>
+            <button onClick={this.pl_click}
+                    className={this.classes}
+                    type={this.buttonType}
+                    aria-readonly={this.p_readonly || this.loading}
+                    aria-disabled={this.p_disabled}
+            >
                 {this.children || this.label}
             </button>
         )

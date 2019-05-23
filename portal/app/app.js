@@ -1,5 +1,6 @@
 import AppMenu from './app-menu'
 import {PlButton} from "../../src/components/pl-button";
+import {PlIcon} from "../../src/components/pl-icon";
 import {Component} from "../../src/scripts/utils";
 
 

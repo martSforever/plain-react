@@ -7,6 +7,10 @@
     height: plVar(iconSize);
     @include transition-all;
 
+    &.pl-icon-loading .pl-icon-svg {
+      animation: rotating 1s linear infinite;
+    }
+
     .pl-icon-svg {
       width: plVar(iconSize);
       height: plVar(iconSize);
@@ -15,9 +19,6 @@
       overflow: hidden;
       position: relative;
 
-      &.pl-icon-loading {
-        animation: rotating 1s linear infinite;
-      }
 
       @keyframes rotating {
         from {

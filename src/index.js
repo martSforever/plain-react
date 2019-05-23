@@ -18,6 +18,10 @@ const PlainReact = {
         this.p_theme = theme
         Service(this)
         this.changeTheme(theme)
+
+        this.$utils.addScript('https://at.alicdn.com/t/font_948159_9jgozvpudu.js')                   //plain
+        this.$utils.addScript('https://at.alicdn.com/t/font_1113642_w82jwgy9lk8.js')                 //ant-design
+        !!iconfont && this.$utils.addScript(iconfont)
     },
 }
 

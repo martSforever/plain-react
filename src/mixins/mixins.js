@@ -26,3 +26,7 @@ export class ThrottleMixin {
         console.log('mounted ThrottleMixin')
     }
 }
+
+export class EditMixin {
+
+}
