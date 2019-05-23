@@ -27,7 +27,13 @@ export default class App extends Component {
                     <div className="app-right">
                         [this.state.p_value]:{this.state.p_value}
                         <input value={this.state.p_value || ''} onChange={e => this.setState({p_value: e.target.value})}/>
-                        <PlButton label={this.state.p_value}/>
+                        <PlButton label={this.state.p_value} icon="pad-check-square"/>
+
+                        <PlButton>
+                            <PlIcon {...{icon: 'pad-check'}}/>
+                            custom content
+                        </PlButton>
+
                         {/*<PlIcon {...{icon: 'pad-check'}}/>
                         <PlEditControl {...this.editBinding} {...this.editListening}/>*/}
                     </div>

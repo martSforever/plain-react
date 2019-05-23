@@ -1,6 +1,7 @@
 import {PlainComponent} from "../PlainComponent/PlainComponent";
 import {PlEditControl} from "./pl-edit-control";
 import {ThrottleMixin} from "../mixins/mixins";
+import {PlIcon} from "./pl-icon";
 
 export class PlButton extends PlainComponent {
 
@@ -71,8 +72,13 @@ export class PlButton extends PlainComponent {
                     aria-readonly={this.p_readonly || this.loading}
                     aria-disabled={this.p_disabled}
             >
-                {this.children || this.label}
-
+                {
+                    !!this.children ? this.children :
+                        <div>
+                            {!!this.icon && <PlIcon icon={this.icon}/>}
+                            {!!this.label && <span>{this.label}</span>}
+                        </div>
+                }
                 <PlEditControl {...this.editBinding} {...this.editListening}/>
             </button>
         )
