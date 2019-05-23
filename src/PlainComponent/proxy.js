@@ -1,6 +1,6 @@
 import {$utils} from "../scripts/utils";
 
-const sharedPropertyDefinition = {
+export const sharedPropertyDefinition = {
     enumerable: true,
     configurable: true,
     get: $utils.noop,

@@ -1,11 +1,42 @@
 import {$utils} from "../scripts/utils";
-import {proxy} from "./proxy";
+import {sharedPropertyDefinition, proxy} from "./proxy";
 
 import {Dep} from "../../portal/app/vue-reactive/Dep";
 import {Watcher} from "../../portal/app/vue-reactive/Watcher";
 
+function pl_initProps(ctx) {
+    ctx.state = ctx.state || {}
+    const _props = {...(ctx.props || {})}
+    ctx.state._props = _props
+    ctx.state.$props = (props) => Object.assign(_props, props)
+    Object.keys(_props).forEach(key => {
+        const dep = new Dep()
+        let val = _props[key]
+        Object.defineProperty(_props, key, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                dep.depend()
+                return val
+            },
+            set: function (newVal) {
+                if (newVal === val) return
+                val = newVal
+                dep.notify()
+            },
+        })
+        sharedPropertyDefinition.get = function getter() {
+            return ctx.state._props[key]
+        }
+        sharedPropertyDefinition.set = function setter(val) {
+            ctx.state._props[key] = val
+        }
+        Object.defineProperty(ctx, key, sharedPropertyDefinition)
+    })
+}
+
 function pl_initData(ctx) {
-    ctx.state = !!ctx.data ? ctx.data() : {}
+    ctx.state = Object.assign({}, ctx.state, !!ctx.data ? ctx.data() : {})
     Object.keys(ctx.state).forEach(key => {
         const dep = new Dep()
         let val = ctx.state[key]
@@ -17,20 +48,13 @@ function pl_initData(ctx) {
                 return val
             },
             set: function (newVal) {
-                if (newVal === ctx.state[key]) return
+                if (newVal === val) return
                 val = newVal
                 ctx.setState({[key]: val})
                 dep.notify()
             },
         })
 
-    })
-}
-
-function pl_initProps(ctx) {
-    if (!ctx.props || Object.keys(ctx.props).length === 0) return
-    Object.keys(ctx.props).forEach(key => {
-        proxy(ctx, 'props', key)
     })
 }
 
@@ -90,6 +114,11 @@ export class PlainComponent extends React.Component {
     }
 
     componentDidMount = () => !!this.mounted && this.mounted()
+
+    static getDerivedStateFromProps(props, state) {
+        state.$props(props)
+        return null
+    }
 
 }
 

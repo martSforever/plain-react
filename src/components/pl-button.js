@@ -10,6 +10,11 @@ export class PlButton extends PlainComponent {
         label: null,
     }
 
+    static getDerivedStateFromProps(props, state) {
+        state.$props(props)
+        return null
+    }
+
     data() {
         return {
             a: -1,
@@ -20,7 +25,7 @@ export class PlButton extends PlainComponent {
     }
 
     created() {
-        console.log('button created', this)
+        // console.log('button created', this)
     }
 
     watch() {
