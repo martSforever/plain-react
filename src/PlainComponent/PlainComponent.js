@@ -1,8 +1,10 @@
 import {$utils, merge} from "../scripts/utils";
-import {sharedPropertyDefinition, proxy} from "./proxy";
+import {sharedPropertyDefinition} from "./proxy";
 
 import {Dep} from "../../portal/app/vue-reactive/Dep";
 import {Watcher} from "../../portal/app/vue-reactive/Watcher";
+
+const HoolNames = ['created', 'mounted', 'beforeDestroyed', 'destroyed']
 
 function pl_getFromContext(ctx) {
     if ($utils.typeOf(ctx) === 'function') ctx = new ctx()
@@ -14,10 +16,10 @@ function pl_getFromContext(ctx) {
     const computed = !!ctx.computed ? ctx.computed() : {}
     const watch = !!ctx.watch ? ctx.watch() : {}
 
-    const created = ctx.created || $utils.noop
-    const mounted = ctx.mounted || $utils.noop
-    const beforeDestroyed = ctx.beforeDestroyed || $utils.noop
-    const destroyed = ctx.destroyed || $utils.noop
+    const created = ctx.created
+    const mounted = ctx.mounted
+    const beforeDestroyed = ctx.beforeDestroyed
+    const destroyed = ctx.destroyed
 
     return {
         props,
@@ -35,22 +37,25 @@ function pl_getFromContext(ctx) {
 }
 
 function pl_initContextDatas(ctx) {
-    const mixins = !!ctx.mixins ? ctx.mixins() : []
+    const mixins = (!!ctx.mixins ? ctx.mixins() : []) || []
     mixins.push(ctx)
     let hook = {created: null, mounted: null, beforeDestroyed: null, destroyed: null}
     const datas = mixins.reduce((ret, item) => {
         const itemData = pl_getFromContext(item);
-        ['created', 'mounted', 'beforeDestroyed', 'destroyed'].forEach((name) => {
+        HoolNames.forEach((name) => {
             const hookFunc = hook[name]
-            hook[name] = () => {
+            const itemHookFunc = itemData[name]
+            hook[name] = (!hookFunc && !itemHookFunc) ? null : () => {
                 !!hookFunc && hookFunc.apply(ctx)
-                !!itemData[name] && itemData[name].apply(ctx)
+                !!itemData[name] && itemHookFunc.apply(ctx)
             }
         })
         ret.push(itemData)
         return ret
     }, [])
+    // console.log(datas)
     ctx.__data__ = merge.all(datas)
+    HoolNames.forEach(name => !hook[name] && delete hook[name])
     Object.assign(ctx, hook)
 }
 
@@ -86,8 +91,10 @@ function pl_initProps(ctx) {
 }
 
 function pl_initData(ctx) {
+    const exclude = ['$props', '_props']
     ctx.state = Object.assign({}, ctx.state, ctx.__data__.data)
     Object.keys(ctx.state).forEach(key => {
+        if (exclude.indexOf(key) > -1) return
         const dep = new Dep()
         let val = ctx.state[key]
         Object.defineProperty(ctx, key, {
@@ -110,13 +117,12 @@ function pl_initData(ctx) {
 
 function pl_initMethods(ctx) {
     const methods = ctx.__data__.methods
-    ctx.$methods = {}
     Object.keys(methods).forEach(key => {
-        const func = methods[key]
-        ctx.$methods[key] = (...args) => func.apply(ctx, args)
-    })
-    Object.keys(ctx.$methods).forEach(key => {
-        proxy(ctx, '$methods', key)
+        Object.defineProperty(ctx, key, {
+            enumerable: true,
+            writable: true,
+            value: (...args) => methods[key].apply(ctx, args)
+        })
     })
 }
 

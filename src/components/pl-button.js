@@ -27,11 +27,10 @@ export class PlButton extends PlainComponent {
 
     created() {
         console.log('created button')
-        console.log('this button', this)
     }
 
     mounted() {
-        console.log('mounted button')
+        console.log('mounted button', this)
     }
 
     watch() {
@@ -64,7 +63,7 @@ export class PlButton extends PlainComponent {
     methods() {
         return {
             pl_click(e) {
-                console.dir(e)
+                console.dir(e.target)
                 console.log(this)
             },
             multiChangeA() {
