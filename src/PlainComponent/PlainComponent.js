@@ -4,8 +4,13 @@ import {sharedPropertyDefinition} from "./proxy";
 import {Dep} from "../../portal/app/vue-reactive/Dep";
 import {Watcher} from "../../portal/app/vue-reactive/Watcher";
 
-const HoolNames = ['created', 'mounted', 'beforeDestroyed', 'destroyed']
+const HookNames = ['created', 'mounted', 'beforeDestroyed', 'destroyed']
 
+/**
+ * 初始化上下文数据，一个组件可能会有多个mixin，一个mixin算一个上下文，组件自己也是一个上下文
+ * @author  韦胜健
+ * @date    2019/5/23 19:06
+ */
 function pl_getFromContext(ctx) {
     if ($utils.typeOf(ctx) === 'function') ctx = new ctx()
 
@@ -22,27 +27,22 @@ function pl_getFromContext(ctx) {
     const destroyed = ctx.destroyed
 
     return {
-        props,
-        state,
-        data,
-        methods,
-        computed,
-        watch,
-
-        created,
-        mounted,
-        beforeDestroyed,
-        destroyed,
+        props, state, data, methods, computed, watch, created, mounted, beforeDestroyed, destroyed,
     }
 }
 
+/**
+ * 初始化组件数据，合并所有的上下文，将props, state, data, methods, computed, watch深度合并，将 created, mounted, beforeDestroyed, destroyed等钩子函数嵌入合并；
+ * @author  韦胜健
+ * @date    2019/5/23 19:07
+ */
 function pl_initContextDatas(ctx) {
     const mixins = (!!ctx.mixins ? ctx.mixins() : []) || []
     mixins.push(ctx)
     let hook = {created: null, mounted: null, beforeDestroyed: null, destroyed: null}
     const datas = mixins.reduce((ret, item) => {
         const itemData = pl_getFromContext(item);
-        HoolNames.forEach((name) => {
+        HookNames.forEach((name) => {
             const hookFunc = hook[name]
             const itemHookFunc = itemData[name]
             hook[name] = (!hookFunc && !itemHookFunc) ? null : () => {
@@ -55,10 +55,15 @@ function pl_initContextDatas(ctx) {
     }, [])
     // console.log(datas)
     ctx.__data__ = merge.all(datas)
-    HoolNames.forEach(name => !hook[name] && delete hook[name])
+    HookNames.forEach(name => !hook[name] && delete hook[name])
     Object.assign(ctx, hook)
 }
 
+/**
+ * 初始化props，并响应式监听依赖
+ * @author  韦胜健
+ * @date    2019/5/23 19:09
+ */
 function pl_initProps(ctx) {
     ctx.state = ctx.__data__.state
     const _props = {...ctx.__data__.props}
@@ -90,6 +95,11 @@ function pl_initProps(ctx) {
     })
 }
 
+/**
+ * 初始化data，保存到state中，并响应式监听依赖
+ * @author  韦胜健
+ * @date    2019/5/23 19:10
+ */
 function pl_initData(ctx) {
     const exclude = ['$props', '_props']
     ctx.state = Object.assign({}, ctx.state, ctx.__data__.data)
@@ -115,6 +125,11 @@ function pl_initData(ctx) {
     })
 }
 
+/**
+ * 初始化methods函数，代理触发函数，同时将函数执行的上下文设置为当前组件
+ * @author  韦胜健
+ * @date    2019/5/23 19:10
+ */
 function pl_initMethods(ctx) {
     const methods = ctx.__data__.methods
     Object.keys(methods).forEach(key => {
@@ -126,6 +141,11 @@ function pl_initMethods(ctx) {
     })
 }
 
+/**
+ * 初始化计算属性
+ * @author  韦胜健
+ * @date    2019/5/23 19:11
+ */
 function pl_initComputed(ctx) {
     const computed = ctx.__data__.computed
     Object.keys(computed).forEach(key => {
@@ -151,6 +171,11 @@ function pl_initComputed(ctx) {
     })
 }
 
+/**
+ * 初始化监听属性
+ * @author  韦胜健
+ * @date    2019/5/23 19:11
+ */
 function pl_initWatch(ctx) {
     const watch = ctx.__data__.watch
     Object.keys(watch).forEach(key => new Watcher(ctx, key, key, watch[key], true))
