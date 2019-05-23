@@ -1,13 +1,14 @@
 import AppMenu from './app-menu'
-import {PlainComponent} from "../../src/PlainComponent/PlainComponent";
 import {PlButton} from "../../src/components/pl-button";
+import {Component} from "../../src/scripts/utils";
 
 
-export default class App extends PlainComponent {
+export default class App extends Component {
 
-    data() {
-        return {
-            p_value: 'hello world'
+    constructor(props) {
+        super(props)
+        this.state = {
+            p_value: 'hello'
         }
     }
 
@@ -22,9 +23,9 @@ export default class App extends PlainComponent {
                         <AppMenu ref="menu"/>
                     </div>
                     <div className="app-right">
-                        [this.p_value]:{this.p_value}
-                        <input value={this.p_value || ''} onChange={e => this.p_value = e.target.value}/>
-                        <PlButton label={this.p_value}/>
+                        [this.state.p_value]:{this.state.p_value}
+                        <input value={this.state.p_value || ''} onChange={e => this.setState({p_value: e.target.value})}/>
+                        <PlButton label={this.state.p_value}/>
                     </div>
                 </div>
             </div>
