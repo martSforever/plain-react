@@ -59,6 +59,16 @@ function pl_initContextDatas(ctx) {
     Object.assign(ctx, hook)
 }
 
+function pl_checkKeyNames(checkObj, targetObj, checkName, targetName) {
+    const targetKeys = Object.keys(targetObj)
+    Object.keys(checkObj).forEach(checkKey => {
+        if (targetKeys.indexOf(checkKey) > -1) {
+            console.log(checkKey, checkObj, targetObj)
+            throw new Error(`${checkName}: ${checkKey} has already been defined as a ${targetName} property`)
+        }
+    })
+}
+
 /**
  * 初始化props，并响应式监听依赖
  * @author  韦胜健
@@ -103,6 +113,7 @@ function pl_initProps(ctx) {
 function pl_initData(ctx) {
     const exclude = ['$props', '_props']
     ctx.state = Object.assign({}, ctx.state, ctx.__data__.data)
+    pl_checkKeyNames(ctx.state, ctx.__data__.props, 'Data', 'props')
     Object.keys(ctx.state).forEach(key => {
         if (exclude.indexOf(key) > -1) return
         const dep = new Dep()
@@ -132,6 +143,9 @@ function pl_initData(ctx) {
  */
 function pl_initMethods(ctx) {
     const methods = ctx.__data__.methods
+    pl_checkKeyNames(methods, ctx.__data__.props, 'Methods', 'props')
+    pl_checkKeyNames(methods, ctx.state, 'Methods', 'data')
+    pl_checkKeyNames(methods, ctx.__data__.computed, 'Methods', 'computed')
     Object.keys(methods).forEach(key => {
         Object.defineProperty(ctx, key, {
             enumerable: true,
@@ -148,6 +162,8 @@ function pl_initMethods(ctx) {
  */
 function pl_initComputed(ctx) {
     const computed = ctx.__data__.computed
+    pl_checkKeyNames(computed, ctx.__data__.props, 'Computed', 'props')
+    pl_checkKeyNames(computed, ctx.state, 'Computed', 'data')
     Object.keys(computed).forEach(key => {
         const getter = () => {
             if (!computed[key]) return
@@ -183,7 +199,6 @@ function pl_initWatch(ctx) {
 
 
 export class PlainComponent extends React.Component {
-
     constructor(props) {
         super(props)
         pl_initContextDatas(this)
@@ -201,6 +216,5 @@ export class PlainComponent extends React.Component {
         state.$props(props)
         return null
     }
-
 }
 
