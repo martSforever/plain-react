@@ -2,6 +2,7 @@ import AppMenu from './app-menu'
 import {PlButton} from "../../src/components/pl-button";
 import {PlIcon} from "../../src/components/pl-icon";
 import {Component} from "../../src/scripts/utils";
+import {PlEditControl} from "../../src/components/pl-edit-control";
 
 
 export default class App extends Component {
@@ -24,9 +25,10 @@ export default class App extends Component {
                         <AppMenu ref="menu"/>
                     </div>
                     <div className="app-right">
-                        [this.state.p_value]:{this.state.p_value}
-                        <input value={this.state.p_value || ''} onChange={e => this.setState({p_value: e.target.value})}/>
-                        <PlButton label={this.state.p_value}/>
+                        {/*[this.state.p_value]:{this.state.p_value}*/}
+                        {/*<input value={this.state.p_value || ''} onChange={e => this.setState({p_value: e.target.value})}/>*/}
+                        {/*<PlButton label={this.state.p_value}/>*/}
+                        <PlEditControl {...{props: {}, on: {}}}/>
                     </div>
                 </div>
             </div>

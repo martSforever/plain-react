@@ -1,4 +1,5 @@
 import {PlainComponent} from "../PlainComponent/PlainComponent";
+import {PlEditControl} from "./pl-edit-control";
 import {ThrottleMixin} from "../mixins/mixins";
 
 export class PlButton extends PlainComponent {
@@ -71,6 +72,8 @@ export class PlButton extends PlainComponent {
                     aria-disabled={this.p_disabled}
             >
                 {this.children || this.label}
+
+                <PlEditControl {...{props: this.editBinding, on: this.editListening}}/>
             </button>
         )
     }
