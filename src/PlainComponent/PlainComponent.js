@@ -59,6 +59,11 @@ function pl_initContextDatas(ctx) {
     Object.assign(ctx, hook)
 }
 
+/**
+ * 检查名称是否已经被使用
+ * @author  韦胜健
+ * @date    2019/5/23 20:00
+ */
 function pl_checkKeyNames(checkObj, targetObj, checkName, targetName) {
     const targetKeys = Object.keys(targetObj)
     Object.keys(checkObj).forEach(checkKey => {
