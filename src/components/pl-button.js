@@ -10,11 +10,6 @@ export class PlButton extends PlainComponent {
         label: null,
     }
 
-    static getDerivedStateFromProps(props, state) {
-        state.$props(props)
-        return null
-    }
-
     data() {
         return {
             a: -1,
