@@ -15,11 +15,14 @@ export class PlButton extends PlainComponent {
             id: 'hello'
         }
     }
-    methods = {
-        async pl_click(e) {
-            console.log(e)
-            console.log(this)
-        },
+
+    methods() {
+        return {
+            async pl_click(e) {
+                console.dir(e)
+                console.log(this)
+            },
+        }
     }
 
     render() {

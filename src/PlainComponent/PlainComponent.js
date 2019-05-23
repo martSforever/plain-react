@@ -1,13 +1,10 @@
 import {$utils} from "../scripts/utils";
 import {proxy} from "./proxy";
 
-const dataKey = 'state'
-
-function pl_initData(ctx, dataFunc) {
-    dataFunc = dataFunc || $utils.noop
-    ctx[dataKey] = dataFunc.apply(ctx) || {}
-    Object.keys(ctx[dataKey]).forEach(key => {
-        proxy(ctx, dataKey, key)
+function pl_initData(ctx) {
+    ctx.state = !!ctx.data ? ctx.data() : {}
+    Object.keys(ctx.state).forEach(key => {
+        proxy(ctx, 'state', key)
     })
 }
 
@@ -19,33 +16,26 @@ function pl_initProps(ctx) {
 }
 
 function pl_initMethods(ctx) {
-    if (!ctx.methods || Object.keys(ctx.methods).length === 0) return
-    Object.keys(ctx.methods).forEach(methodKey => {
-        const func = ctx.methods[methodKey]
-        ctx.methods[methodKey] = function (...args) {
-            return func.apply(ctx, args)
-        }
+    const methods = !!ctx.methods ? ctx.methods() : {}
+    ctx.$methods = {}
+    Object.keys(methods).forEach(key => {
+        const func = methods[key]
+        ctx.$methods[key] = (...args) => func.apply(ctx, args)
     })
-    ctx.$methods = ctx.methods
-    delete ctx.methods
     Object.keys(ctx.$methods).forEach(key => {
         proxy(ctx, '$methods', key)
     })
 }
 
 
-
 export class PlainComponent extends React.Component {
 
     constructor(props) {
         super(props)
-        pl_initData(this, this.data)
+        pl_initData(this)
         pl_initProps(this)
-        setTimeout(() => {
-            pl_initMethods(this)
-            this.forceUpdate()
-            !!this.created && this.created()
-        }, 0)
+        pl_initMethods(this)
+        !!this.created && this.created()
     }
 
     componentDidMount = () => !!this.mounted && this.mounted()
