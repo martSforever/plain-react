@@ -2,7 +2,7 @@ import {PlainComponent} from "../PlainComponent/PlainComponent";
 
 export class PlButton extends PlainComponent {
 
-    static staticProps = {
+    static defaultProps = {
         type: 'fill',
         color: 'primary',
         shape: 'fillet',
@@ -30,6 +30,9 @@ export class PlButton extends PlainComponent {
             },
             b(newVal, oldVal) {
                 console.log(`b change from [${oldVal}] to [${newVal}]`)
+            },
+            label(newVal, oldVal) {
+                console.log(`label change from [${oldVal}] to [${newVal}]`)
             },
         }
     }

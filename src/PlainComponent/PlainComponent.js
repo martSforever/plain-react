@@ -81,8 +81,8 @@ export class PlainComponent extends React.Component {
 
     constructor(props) {
         super(props)
-        pl_initData(this)
         pl_initProps(this)
+        pl_initData(this)
         pl_initMethods(this)
         pl_initComputed(this)
         pl_initWatch(this)

@@ -5,6 +5,12 @@ import {PlButton} from "../../src/components/pl-button";
 
 export default class App extends PlainComponent {
 
+    data() {
+        return {
+            p_value: 'hello world'
+        }
+    }
+
     render() {
         return (
             <div className="app">
@@ -16,7 +22,9 @@ export default class App extends PlainComponent {
                         <AppMenu ref="menu"/>
                     </div>
                     <div className="app-right">
-                        <PlButton label={'hello world'}/>
+                        [this.p_value]:{this.p_value}
+                        <input value={this.p_value || ''} onChange={e => this.p_value = e.target.value}/>
+                        <PlButton label={this.p_value}/>
                     </div>
                 </div>
             </div>
