@@ -1,5 +1,6 @@
 import PlainUtils from 'plain-utils'
 import {Component} from 'react'
+import classnames from 'classnames'
 
 const merge = require('deepmerge')
 
@@ -10,4 +11,5 @@ export {
     StorageService,
     Component,
     merge,
+    classnames,
 }

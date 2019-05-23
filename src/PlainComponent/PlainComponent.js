@@ -1,4 +1,4 @@
-import {$utils, merge} from "../scripts/utils";
+import {$utils, classnames, merge} from "../scripts/utils";
 import {sharedPropertyDefinition} from "./proxy";
 
 import {Dep} from "../../portal/app/vue-reactive/Dep";
@@ -215,6 +215,10 @@ export class PlainComponent extends React.Component {
     static getDerivedStateFromProps(props, state) {
         state.$props(props)
         return null
+    }
+
+    classnames(...args) {
+        return classnames(...args)
     }
 }
 

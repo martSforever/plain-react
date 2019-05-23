@@ -12,10 +12,6 @@ export default class App extends Component {
         }
     }
 
-    componentDidMount() {
-        console.log('App mounted', this)
-    }
-
     render() {
         return (
             <div className="app">
