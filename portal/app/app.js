@@ -25,10 +25,11 @@ export default class App extends Component {
                         <AppMenu ref="menu"/>
                     </div>
                     <div className="app-right">
-                        {/*[this.state.p_value]:{this.state.p_value}*/}
-                        {/*<input value={this.state.p_value || ''} onChange={e => this.setState({p_value: e.target.value})}/>*/}
-                        {/*<PlButton label={this.state.p_value}/>*/}
-                        <PlEditControl {...{props: {}, on: {}}}/>
+                        [this.state.p_value]:{this.state.p_value}
+                        <input value={this.state.p_value || ''} onChange={e => this.setState({p_value: e.target.value})}/>
+                        <PlButton label={this.state.p_value}/>
+                        {/*<PlIcon {...{icon: 'pad-check'}}/>
+                        <PlEditControl {...this.editBinding} {...this.editListening}/>*/}
                     </div>
                 </div>
             </div>

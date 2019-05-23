@@ -5,7 +5,7 @@ import {ThrottleMixin} from "../mixins/mixins";
 export class PlButton extends PlainComponent {
 
     mixins() {
-        // return [ThrottleMixin]
+        return [ThrottleMixin]
     }
 
     static defaultProps = {
@@ -73,7 +73,7 @@ export class PlButton extends PlainComponent {
             >
                 {this.children || this.label}
 
-                <PlEditControl {...{props: this.editBinding, on: this.editListening}}/>
+                <PlEditControl {...this.editBinding} {...this.editListening}/>
             </button>
         )
     }
