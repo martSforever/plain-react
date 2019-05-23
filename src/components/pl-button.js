@@ -16,6 +16,10 @@ export class PlButton extends PlainComponent {
         }
     }
 
+    created() {
+        console.log('button created', this)
+    }
+
     methods() {
         return {
             async pl_click(e) {

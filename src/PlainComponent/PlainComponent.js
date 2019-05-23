@@ -1,9 +1,30 @@
 import {$utils} from "../scripts/utils";
 import {proxy} from "./proxy";
 
+import {Dep} from "../../portal/app/vue-reactive/Dep";
+import {Watcher} from "../../portal/app/vue-reactive/Watcher";
+
+function definedReactive(data, key, val) {
+    const dep = new Dep()
+    Object.defineProperty(data, key, {
+        configurable: true,
+        enumerable: true,
+        get: function () {
+            dep.depend()
+            return val
+        },
+        set: function (newVal) {
+            if (newVal === val) return
+            val = newVal
+            dep.notify()
+        },
+    })
+}
+
 function pl_initData(ctx) {
     ctx.state = !!ctx.data ? ctx.data() : {}
     Object.keys(ctx.state).forEach(key => {
+        definedReactive(ctx.state, key, ctx.state[key])
         proxy(ctx, 'state', key)
     })
 }
