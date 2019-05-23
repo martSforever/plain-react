@@ -22,8 +22,12 @@ export default class App extends PlainComponent {
 
     methods = {}
 
-    componentDidMount() {
-        console.log(this)
+    created() {
+        console.log('created', this)
+    }
+
+    mounted() {
+        console.log('mounted', this)
     }
 
     render() {

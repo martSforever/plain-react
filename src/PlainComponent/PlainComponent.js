@@ -15,5 +15,11 @@ export class PlainComponent extends React.Component {
     constructor(props) {
         super(props)
         pl_initData(this.data, this)
+
+        !!this.created && this.created()
     }
+
+    componentDidMount = () => !!this.mounted && this.mounted()
+
 }
+
