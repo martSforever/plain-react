@@ -4,28 +4,26 @@ import {proxy} from "./proxy";
 import {Dep} from "../../portal/app/vue-reactive/Dep";
 import {Watcher} from "../../portal/app/vue-reactive/Watcher";
 
-function definedReactive(data, key, val) {
-    const dep = new Dep()
-    Object.defineProperty(data, key, {
-        configurable: true,
-        enumerable: true,
-        get: function () {
-            dep.depend()
-            return val
-        },
-        set: function (newVal) {
-            if (newVal === val) return
-            val = newVal
-            dep.notify()
-        },
-    })
-}
-
 function pl_initData(ctx) {
     ctx.state = !!ctx.data ? ctx.data() : {}
     Object.keys(ctx.state).forEach(key => {
-        definedReactive(ctx.state, key, ctx.state[key])
-        proxy(ctx, 'state', key)
+        const dep = new Dep()
+        let val = ctx.state[key]
+        Object.defineProperty(ctx, key, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                dep.depend()
+                return val
+            },
+            set: function (newVal) {
+                if (newVal === ctx.state[key]) return
+                val = newVal
+                ctx.setState({[key]: val})
+                dep.notify()
+            },
+        })
+
     })
 }
 
@@ -48,6 +46,36 @@ function pl_initMethods(ctx) {
     })
 }
 
+function pl_initComputed(ctx) {
+    const computed = !!ctx.computed ? ctx.computed() : {}
+    Object.keys(computed).forEach(key => {
+        const getter = () => {
+            if (!computed[key]) return
+            return computed[key].apply(ctx)
+        }
+        const watcher = new Watcher(ctx, key, getter)
+        Object.defineProperty(ctx, key, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                if (watcher.dirty) {
+                    watcher.evaluate()
+                }
+                if (Dep.target) {
+                    watcher.depend()
+                }
+                return watcher.value
+            },
+            set: $utils.noop
+        })
+    })
+}
+
+function pl_initWatch(ctx) {
+    const watch = !!ctx.watch ? ctx.watch() : {}
+    Object.keys(watch).forEach(key => new Watcher(ctx, key, key, watch[key], true))
+}
+
 
 export class PlainComponent extends React.Component {
 
@@ -56,6 +84,8 @@ export class PlainComponent extends React.Component {
         pl_initData(this)
         pl_initProps(this)
         pl_initMethods(this)
+        pl_initComputed(this)
+        pl_initWatch(this)
         !!this.created && this.created()
     }
 
