@@ -16,7 +16,6 @@ export class PlScroll extends PlainComponent {
                  onMouseLeave={this._mouseleave}
             >
                 <div className="pl-scroll-content-wrapper"
-                     onScroll={this._handleScroll}
                      style={this.wrapperStyles}
                      ref='wrapper'
                 >
@@ -25,7 +24,6 @@ export class PlScroll extends PlainComponent {
                          style={this.contentStyles}
                     >
                         {this.props.children}
-                        indicatorTop:{this.indicatorTop}
                     </div>
 
                     {!this.hideScrollbar && !!this.scrollY &&
@@ -92,8 +90,7 @@ export class PlScroll extends PlainComponent {
     mounted() {
         erdUltraFast.listenTo(this.refs.content, this._contentResize);
         erdUltraFast.listenTo(this.refs.host, this._hostResize);
-
-        console.log(this)
+        this.refs.wrapper.addEventListener('scroll', this._handleScroll)
     }
 
     computed() {
@@ -184,9 +181,8 @@ export class PlScroll extends PlainComponent {
                 this.hostHeight = el.offsetHeight;
             },
             _handleScroll(e) {
-                console.log('_handleScroll-------------------------------')
-                this.contentWrapperScrollTop = e.target.scrollTop.toFixed(2);
-                this.contentWrapperScrollLeft = e.target.scrollLeft.toFixed(2);
+                this.contentWrapperScrollTop = e.target.scrollTop;
+                this.contentWrapperScrollLeft = e.target.scrollLeft;
                 this.$emit('scroll', e);
 
                 if (this.p_verticalPosition === 'top' && this.contentWrapperScrollTop > this.topScrollDuration) {

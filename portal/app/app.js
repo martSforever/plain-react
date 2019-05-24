@@ -29,9 +29,9 @@ export default class App extends Component {
                         <PlButton label={this.state.p_value} icon="pad-check-square"/>
                         {['primary', 'success', 'warn', 'error', 'info'].map(color => <PlButton color={color} label={color} key={color}/>)}
 
-                        <div style={{height: '300px', width: '300px', backgroundColor: '#f2f2f2'}}>
-                            <PlScroll>
-                                <div style={{height: '600px', width: '30px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',backgroundColor:'green',color:'white'}}>
+                        <div style={{height: '300px', width: '300px', backgroundColor: '#f2f2f2', border: 'solid 1px #ddd'}}>
+                            <PlScroll scrollX>
+                                <div style={{height: '600px', width: '500px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', color: 'black'}}>
                                     <span>hello world</span>
                                 </div>
                             </PlScroll>
