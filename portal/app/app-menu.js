@@ -1,4 +1,5 @@
 import React from 'react'
+import {PlScroll} from "../../src/components/pl-scroll";
 
 export default class AppMenu extends React.Component {
     constructor(props) {
@@ -22,7 +23,7 @@ export default class AppMenu extends React.Component {
                         {title: 'BaseTable基础表格列测试', icon: 'pl-table-solid', page: '/table/demo-base-table-column', complete: false},
                     ],
                 },
-                /*{
+                {
                     title: '测试',
                     menus: [
                         {title: 'Test测试', icon: 'pl-tools', page: '/normal/demo-test', complete: true},
@@ -109,7 +110,7 @@ export default class AppMenu extends React.Component {
                 {
                     title: '指令',
                     menus: [],
-                },*/
+                },
             ],
         }
     }
@@ -118,26 +119,28 @@ export default class AppMenu extends React.Component {
         return (
             <div className="app-menu">
                 <div className="app-menu-content">
-                    {this.state.menuGroups.map((group, groupIndex) => {
-                        return (
-                            <div className="app-menu-group" key={groupIndex}>
-                                <div className="app-menu-group-title">
-                                    {group.title}
-                                </div>
-                                <div className="app-menu-item-wrapper">
-                                    {group.menus.map((menu, menuIndex) => {
-                                        return (
-                                            <div className="app-menu-item" key={menuIndex}>
-                                                <div>
-                                                    <span>{menu.title}</span>
+                    <PlScroll scrollbarSize={6}>
+                        {this.state.menuGroups.map((group, groupIndex) => {
+                            return (
+                                <div className="app-menu-group" key={groupIndex}>
+                                    <div className="app-menu-group-title">
+                                        {group.title}
+                                    </div>
+                                    <div className="app-menu-item-wrapper">
+                                        {group.menus.map((menu, menuIndex) => {
+                                            return (
+                                                <div className="app-menu-item" key={menuIndex}>
+                                                    <div>
+                                                        <span>{menu.title}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )
-                                    })}
+                                            )
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
+                    </PlScroll>
                 </div>
             </div>
         );
