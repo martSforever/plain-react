@@ -5,7 +5,7 @@ export class PlEditControl extends PlainComponent {
 
     render() {
         return (
-            <div className="pl-edit-control">
+            <div className="pl-edit-control" style={{display: this.isValid ? 'none' : 'block'}}>
                 <span>{this.validMsg}</span>
             </div>
         );

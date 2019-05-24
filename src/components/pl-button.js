@@ -5,6 +5,26 @@ import {PlIcon} from "./pl-icon";
 
 export class PlButton extends PlainComponent {
 
+    render() {
+        return (
+            <button onClick={this.pl_click}
+                    className={this.classes}
+                    type={this.buttonType}
+                    aria-readonly={this.p_readonly || this.loading}
+                    aria-disabled={this.p_disabled}
+            >
+                {
+                    !!this.children ? this.children :
+                        <div>
+                            {!!this.icon && <PlIcon icon={this.icon}/>}
+                            {!!this.label && <span>{this.label}</span>}
+                        </div>
+                }
+                <PlEditControl {...this.editBinding} {...this.editListening}/>
+            </button>
+        )
+    }
+
     mixins() {
         return [ThrottleMixin]
     }
@@ -25,10 +45,6 @@ export class PlButton extends PlainComponent {
         buttonType: 'button',
 
         onClick: null,
-    }
-
-    created() {
-        console.log('button created', this)
     }
 
     computed() {
@@ -62,25 +78,5 @@ export class PlButton extends PlainComponent {
             },
 
         }
-    }
-
-    render() {
-        return (
-            <button onClick={this.pl_click}
-                    className={this.classes}
-                    type={this.buttonType}
-                    aria-readonly={this.p_readonly || this.loading}
-                    aria-disabled={this.p_disabled}
-            >
-                {
-                    !!this.children ? this.children :
-                        <div>
-                            {!!this.icon && <PlIcon icon={this.icon}/>}
-                            {!!this.label && <span>{this.label}</span>}
-                        </div>
-                }
-                <PlEditControl {...this.editBinding} {...this.editListening}/>
-            </button>
-        )
     }
 }

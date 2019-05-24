@@ -18,13 +18,7 @@ export class MountedMixin {
 }
 
 export class ThrottleMixin {
-    created() {
-        console.log('created ThrottleMixin')
-    }
 
-    mounted() {
-        console.log('mounted ThrottleMixin')
-    }
 }
 
 export class EditMixin {
