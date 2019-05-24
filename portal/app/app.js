@@ -3,6 +3,7 @@ import {PlButton} from "../../src/components/pl-button";
 import {PlIcon} from "../../src/components/pl-icon";
 import {Component} from "../../src/scripts/utils";
 import {PlEditControl} from "../../src/components/pl-edit-control";
+import {PlScroll} from "../../src/components/pl-scroll";
 
 
 export default class App extends Component {
@@ -26,8 +27,15 @@ export default class App extends Component {
                     </div>
                     <div className="app-right">
                         <PlButton label={this.state.p_value} icon="pad-check-square"/>
-
                         {['primary', 'success', 'warn', 'error', 'info'].map(color => <PlButton color={color} label={color} key={color}/>)}
+
+                        <div style={{height: '300px', width: '300px', backgroundColor: '#f2f2f2'}}>
+                            <PlScroll>
+                                <div style={{height: '600px', width: '30px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',backgroundColor:'green',color:'white'}}>
+                                    <span>hello world</span>
+                                </div>
+                            </PlScroll>
+                        </div>
                     </div>
                 </div>
             </div>

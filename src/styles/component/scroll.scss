@@ -1,4 +1,4 @@
-@mixin component-scroll{
+@mixin component-scroll {
   .pl-scroll {
     display: block;
     height: 100%;
@@ -11,6 +11,7 @@
       height: calc(100% + 17px);
       width: calc(100% + 17px);
       overflow: scroll;
+
       .pl-scroll-content {
         width: max-content;
         min-width: 100%;
@@ -18,11 +19,13 @@
         float: left;
       }
     }
+
     .pl-scroll-vertical-indicator-wrapper {
       position: absolute;
       right: 0;
       top: 0;
       bottom: 0;
+
       .pl-scroll-vertical-indicator {
         position: absolute;
         top: 0;
@@ -34,11 +37,13 @@
         transition-property: opacity, height;
       }
     }
+
     .pl-scroll-horizontal-indicator-wrapper {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
+
       .pl-scroll-horizontal-indicator {
         position: absolute;
         left: 0;
@@ -50,16 +55,14 @@
         transition-property: opacity, width;
       }
     }
+
     &.pl-scroll-hover {
-      & {
-        & > .pl-scroll-vertical-indicator-wrapper, & > .pl-scroll-horizontal-indicator-wrapper {
-          .pl-scroll-vertical-indicator {
-            opacity: 1;
-          }
-          .pl-scroll-horizontal-indicator {
-            opacity: 1;
-          }
-        }
+      .pl-scroll-vertical-indicator {
+        opacity: 1;
+      }
+
+      .pl-scroll-horizontal-indicator {
+        opacity: 1;
       }
     }
 

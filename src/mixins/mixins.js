@@ -6,12 +6,7 @@ export class MountedMixin {
         }
     }
 
-    created() {
-        console.log('created MountedMixin',)
-    }
-
     mounted() {
-        console.log('mounted MountedMixin',)
         this.p_mounted = true
     }
 
