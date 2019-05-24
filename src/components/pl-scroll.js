@@ -215,7 +215,7 @@ export class PlScroll extends PlainComponent {
                 this.dragStartY = e.clientY;
                 document.addEventListener('mousemove', this.vIndicatorDragMove);
                 document.addEventListener('mouseup', this.vIndicatorDragEnd);
-                // this.$plain.$dom.enableSelectNone()
+                this.$plain.$dom.enableSelectNone()
             },
             vIndicatorDragMove(e) {
                 let deltaY = e.clientY - this.dragStartY;
@@ -226,7 +226,7 @@ export class PlScroll extends PlainComponent {
                 this.draging = false
                 document.removeEventListener('mousemove', this.vIndicatorDragMove);
                 document.removeEventListener('mouseup', this.vIndicatorDragEnd);
-                // this.$plain.$dom.disabledSelectNone()
+                this.$plain.$dom.disabledSelectNone()
             },
             hIndicatorDragStart(e) {
                 this.draging = true
@@ -234,7 +234,7 @@ export class PlScroll extends PlainComponent {
                 this.dragStartX = e.clientX;
                 document.addEventListener('mousemove', this.hIndicatorDragMove);
                 document.addEventListener('mouseup', this.hIndicatorDragEnd);
-                // this.$plain.$dom.enableSelectNone()
+                this.$plain.$dom.enableSelectNone()
             },
             hIndicatorDragMove(e) {
                 let deltaX = e.clientX - this.dragStartX;
@@ -245,7 +245,7 @@ export class PlScroll extends PlainComponent {
                 this.draging = false
                 document.removeEventListener('mousemove', this.hIndicatorDragMove);
                 document.removeEventListener('mouseup', this.hIndicatorDragEnd);
-                // this.$plain.$dom.disabledSelectNone()
+                this.$plain.$dom.disabledSelectNone()
             },
             _mouseenter() {
                 this.hover = true;

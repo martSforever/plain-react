@@ -3,6 +3,7 @@ import {sharedPropertyDefinition} from "./proxy";
 
 import {Dep} from "../../portal/app/vue-reactive/Dep";
 import {Watcher} from "../../portal/app/vue-reactive/Watcher";
+import $plain from 'src/index'
 
 const HookNames = ['created', 'mounted', 'beforeDestroyed', 'destroyed']
 
@@ -204,6 +205,9 @@ function pl_initWatch(ctx) {
 
 
 export class PlainComponent extends React.Component {
+
+    $plain = $plain
+
     constructor(props) {
         super(props)
         pl_initContextDatas(this)
