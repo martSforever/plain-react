@@ -110,7 +110,6 @@ export class PlScroll extends PlainComponent {
                 return (this.contentHeight > this.hostHeight + 1) ? this.hostHeight * this.hostHeight / this.contentHeight : 0;
             },
             indicatorTop() {
-                console.log('indicatorTop', this.contentWrapperScrollTop)
                 return (this.hostHeight - this.indicatorHeight) * this.contentWrapperScrollTop / (this.contentHeight - this.hostHeight);
             },
             indicatorWidth() {
@@ -177,19 +176,17 @@ export class PlScroll extends PlainComponent {
                 this.refs.wrapper.scrollTop = 0
             },
             _contentResize(el) {
-                console.log('_contentResize', el.offsetWidth, el.offsetHeight)
                 this.contentWidth = el.offsetWidth;
                 this.contentHeight = el.offsetHeight;
             },
             _hostResize(el) {
-                console.log('_hostResize', el.offsetWidth, el.offsetHeight)
                 this.hostWidth = el.offsetWidth;
                 this.hostHeight = el.offsetHeight;
             },
             _handleScroll(e) {
                 console.log('_handleScroll-------------------------------')
-                this.contentWrapperScrollTop = e.target.scrollTop;
-                this.contentWrapperScrollLeft = e.target.scrollLeft;
+                this.contentWrapperScrollTop = e.target.scrollTop.toFixed(2);
+                this.contentWrapperScrollLeft = e.target.scrollLeft.toFixed(2);
                 this.$emit('scroll', e);
 
                 if (this.p_verticalPosition === 'top' && this.contentWrapperScrollTop > this.topScrollDuration) {

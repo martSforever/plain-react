@@ -227,7 +227,7 @@ export class PlainComponent extends React.Component {
     }
 
     $emit(name, ...args) {
-        console.log('emit', `on${name.charAt(0).toUpperCase() + name.substring(1)}`)
+        // console.log('emit', `on${name.charAt(0).toUpperCase() + name.substring(1)}`)
         !!this[name] && this[`on${name.charAt(0).toUpperCase() + name.substring(1)}`](...args)
     }
 }
